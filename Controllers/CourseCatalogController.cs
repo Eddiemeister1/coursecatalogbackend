@@ -1,4 +1,5 @@
 ﻿using CourseCatalogApi.Models;
+using CourseCatalogApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,21 @@ namespace CourseCatalogApi.Controllers
 {
     public class CourseCatalogController : ControllerBase
     {
+        //this is fake - not good for production.
+
+        private readonly ICourseDataService _dataService;
+
+
+
+        public CourseCatalogController(ICourseDataService dataService)
+        {
+            _dataService = dataService;
+        }
         [HttpGet("course-catalog")]
+        [ResponseCache(Duration = 15)]
         public async Task<ActionResult<GetCourseCatalogResponse>> GetAllCourses()
         {
+            await Task.Delay(2000); // Simulated - don't really do this.
             var response = new GetCourseCatalogResponse
             {
                 Data = new List<CourseCatalogResponseItem>
@@ -22,6 +35,13 @@ namespace CourseCatalogApi.Controllers
                 }
             };
             return Ok(response);
+        }
+
+        [HttpPut("course-catalog/{id:int}/numberOfDays/{days:int}")]
+        public async Task<ActionResult> UpdateNumberOfDays(int id, int days)
+        {
+            await _dataService.UpdateNumberOfDays(id, days);
+            return NoContent();// cool, Did it.
         }
     }
 }
